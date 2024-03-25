@@ -25,7 +25,16 @@ class Analyzer:
         for line in stocks:
             self.stonks[line[:-1]] = {}
 
-    def update_profiles(self, headless: bool = True):
+    def update_profiles(self, headless: bool = True, first: int = 0):
+        if first <= 0 or first > len(self.stonks):
+            first = len(self.stonks)
+
+        print(first)
+
+        index = 0
+        while os.path.isfile("./results" + str(index) + ".csv"):
+            index += 1
+
         chrome_options = Options()
         if headless:
             chrome_options.add_argument("--headless")
@@ -33,13 +42,11 @@ class Analyzer:
         chrome_options.add_argument("--log-level=3")
 
         driver = webdriver.Chrome(options=chrome_options)
-        index = 0
-        while os.path.isfile("./results" + str(index) + ".csv"):
-            index += 1
 
-        for stock in list(self.stonks.keys())[0:5]:
+        for i, stock in enumerate(list(self.stonks.keys())[0:first]):
+            print(f"{i} out of {len(self.stonks)}")
             try:
-                driver.get("https://www.cnn.com/markets/stocks/" + stock)
+                driver.get(f"https://www.cnn.com/markets/stocks/{stock}")
 
                 soup = bs(driver.page_source, "html.parser")
 
@@ -60,7 +67,7 @@ class Analyzer:
                 if low.attrs["fill"] == "#D50000":
                     low_txt = "-" + low_txt
 
-                with open("./results" + str(index) + ".csv", "a") as file:
+                with open(f"./results{index}.csv", "a") as file:
                     file.write(
                         stock
                         + ", "
@@ -83,5 +90,5 @@ class Analyzer:
                         + "Failed"
                         + ",\n"
                     )
-
+        print()
         driver.close()

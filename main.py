@@ -1,3 +1,4 @@
+from math import floor
 from analyzer import Analyzer
 import time
 
@@ -7,6 +8,11 @@ analyzer.get_stonks("stock_list.csv")
 analyzer.update_profiles()
 end = time.perf_counter()
 
-print("=============================================")
-print("\tTime taken:", end - start)
-print("=============================================")
+time = end - start
+hours = floor(time / 3600)
+mins = floor((time % 3600) / 60)
+secs = floor(time % 60)
+
+print("=================================================================")
+print(f"\tTime taken: {hours} hours, {mins} minutess, {secs} seconds")
+print("=================================================================")
